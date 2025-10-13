@@ -9,33 +9,43 @@ Three “layers” of lifetime/authorization:
 
 ### Client token (no consent_id)
 
-How: POST /connect/mtls/token with grant_type=client_credentials (no consent_id).
-Use: manage consents (e.g., POST /account-access-consents, GET /account-access-consents/{id}).
-Cannot: call AIS data (/accounts, /balances, /transactions, /beneficiaries) because it doesn’t carry a consent_id nor the required scopes for data.
-Lifetime: 600s (config: ACCESS_TOKEN_TTL_SECONDS).
+How: `POST /connect/mtls/token with grant_type=client_credentials` (no consent_id).
+
+Use: manage consents (e.g., `POST /account-access-consents, GET /account-access-consents/{id}`).
+
+Cannot: call AIS data (`/accounts`, `/balances`, `/transactions`, `/beneficiaries`) because it doesn’t carry a `consent_id` nor the required scopes for data.
+
+Lifetime: 600s (config: `ACCESS_TOKEN_TTL_SECONDS`).
+
 Refresh: you also receive a refresh token; refreshing returns another client token (still no consent_id).
 
 ### Data access token (bound to consent)
 
-How: same endpoint, but include consent_id=<ConsentId> and ask for scopes you need (e.g., accounts.read balances.read ...).
-Use: call AIS data endpoints for the accounts that PSU authorised on that consent.
-Lifetime: 600s (config).
-Refresh: yes—refresh returns a new access token with the same consent_id and scopes.
+How: same endpoint, but include `consent_id=<ConsentId>` and ask for scopes you need (e.g., `accounts.read` `balances.read` ...).
 
-NOTE: Both client tokens and data tokens are JWTs with fields like: sub, scope, consent_id, user_id, exp. They’re signed with JWT_SECRET and require X-Client-Cert: enrolled at the token endpoint.
+Use: call AIS data endpoints for the accounts that PSU authorised on that consent.
+
+Lifetime: 600s (config).
+
+Refresh: yes—refresh returns a new access token with the same `consent_id` and scopes.
+
+NOTE: Both client tokens and data tokens are JWTs with fields like: `sub`, `scope`, `consent_id`, `user_id`, `exp`. They’re signed with `JWT_SECRET` and require `X-Client-Cert`: enrolled at the token endpoint.
 
 ### Refresh token
 
 How: returned by the token endpoint alongside every access token.
+
 Use: grant_type=refresh_token to obtain a new access token (and a rotated refresh token).
-Lifetime: 30 days (config: REFRESH_TOKEN_TTL_DAYS).
+
+Lifetime: 30 days (config: `REFRESH_TOKEN_TTL_DAYS`).
+
 Scope/consent_id: inherited from the original token that produced it—unchanged by refresh.
 
 
 ### Consent vs token lifetimes (how they interplay)
 * Authorisation window (server-side rule): PSU must approve within 90 seconds of creation.
-⋅⋅⋅⋅* Config: AUTHORISATION_WINDOW_SECONDS=90.
-⋅⋅⋅⋅* If elapsed while AwaitingAuthorisation → consent becomes effectively Expired (locked).
+  * Config: `AUTHORISATION_WINDOW_SECONDS=90`.
+  * If elapsed while AwaitingAuthorisation → consent becomes effectively Expired (locked).
 * Consent ExpirationDateTime: absolute expiry for using that consent after it’s Authorised. If passed → data endpoints return 403 consent_expired, even if your access token is still valid.
 * Access token TTL (600s): governs API call authorization only. When it expires you’ll see 401 unauthorized: Access token expired → use refresh.
 * Refresh token TTL (30d): after this you must start a new consent/token flow. Key point: Tokens do not keep a consent “alive.” Even a freshly refreshed data token will get 403 if the underlying consent is Rejected / Revoked / Expire
@@ -47,7 +57,7 @@ Scope/consent_id: inherited from the original token that produced it—unchanged
 
 * API running at http://localhost:8000 or substitute curl commands with https://open-banking-ais.onrender.com 
 * You have curl and jq installed (on mac install using brew)
-* Endpoints /connect/mtls/token, /account-access-consents, /psu/authorize, /accounts are available
+* Endpoints `/connect/mtls/token`, `/account-access-consents`, `/psu/authorize`, `/accounts` are available
 * You have an authorized <CLIENT_ID> and <CLIENT_SECRET> required for steps 1 and 4
 
 
@@ -94,7 +104,7 @@ curl -s https://open-banking-ais.onrender.com/account-access-consents/$CONSENT_I
 
 You can use the HTML page in a browser:
 
-https://open-banking-ais.onrender.com/psu/authorize/ui?consentId=<CONSENT_ID>
+`https://open-banking-ais.onrender.com/psu/authorize/ui?consentId=<CONSENT_ID>`
 
 
 Or do it headless via a form POST (approve acc-001 and acc-002):
@@ -147,7 +157,7 @@ You should only see the accounts the PSU selected (e.g., acc-001, acc-002). If y
 * 400 invalid_request: Missing refresh_token → pass refresh_token= field.
 * 400 invalid_grant: Unknown refresh token → token was never issued, already rotated and discarded, or typo.
 * 400 invalid_grant: Refresh token expired → 30-day TTL passed; you must re-run the full consent/token flow.
-* 401 “mtls_required” on token calls → ensure -H "X-Client-Cert: enrolled" is present.
+* 401 “mtls_required” on token calls → ensure `-H "X-Client-Cert`: enrolled" is present.
 * 401 “Access token expired” → tokens last 600s; repeat step 4 (or use the refresh flow).
 * 403 “consent_not_authorised” or "consent_expired on data calls" on /accounts → make sure you ran step 3 and that you’re using a token with consent_id (step 4), not the client token from step 1.
 
@@ -207,7 +217,7 @@ We list all the error codes for completeness below
 
 Comes from Pydantic/validation (e.g., bad datetime format in JSON).
 
-Send properly formatted ISO-8601 datetimes: YYYY-MM-DDTHH:MM:SSZ.
+Send properly formatted ISO-8601 datetimes: `YYYY-MM-DDTHH:MM:SSZ`.
 
 ### 500 Internal Server Error (unexpected)
 
