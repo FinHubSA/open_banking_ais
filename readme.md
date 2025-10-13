@@ -9,15 +9,15 @@ Three “layers” of lifetime/authorization:
 
 ### Client token (no consent_id)
 
-How: `POST /connect/mtls/token with grant_type=client_credentials` (no consent_id).
+How: `POST /connect/mtls/token with grant_type=client_credentials` (no `consent_id`).
 
 Use: manage consents (e.g., `POST /account-access-consents, GET /account-access-consents/{id}`).
 
 Cannot: call AIS data (`/accounts`, `/balances`, `/transactions`, `/beneficiaries`) because it doesn’t carry a `consent_id` nor the required scopes for data.
 
-Lifetime: 600s (config: `ACCESS_TOKEN_TTL_SECONDS`).
+Lifetime: 600s (`config: ACCESS_TOKEN_TTL_SECONDS`).
 
-Refresh: you also receive a refresh token; refreshing returns another client token (still no consent_id).
+Refresh: you also receive a refresh token; refreshing returns another client token (still no `consent_id`).
 
 ### Data access token (bound to consent)
 
@@ -29,13 +29,13 @@ Lifetime: 600s (config).
 
 Refresh: yes—refresh returns a new access token with the same `consent_id` and scopes.
 
-NOTE: Both client tokens and data tokens are JWTs with fields like: `sub`, `scope`, `consent_id`, `user_id`, `exp`. They’re signed with `JWT_SECRET` and require `X-Client-Cert`: enrolled at the token endpoint.
+NOTE: Both client tokens and data tokens are JWTs with fields like: `sub`, `scope`, `consent_id`, `user_id`, `exp`. They’re signed with `JWT_SECRET` and require `X-Client-Cert: enrolled` at the token endpoint.
 
 ### Refresh token
 
 How: returned by the token endpoint alongside every access token.
 
-Use: grant_type=refresh_token to obtain a new access token (and a rotated refresh token).
+Use: `grant_type=refresh_token` to obtain a new access token (and a rotated refresh token).
 
 Lifetime: 30 days (config: `REFRESH_TOKEN_TTL_DAYS`).
 
@@ -55,7 +55,7 @@ Scope/consent_id: inherited from the original token that produced it—unchanged
 
 ### 0 Assumptions
 
-* API running at http://localhost:8000 or substitute curl commands with https://open-banking-ais.onrender.com 
+* API running at `http://localhost:8000` or substitute curl commands with `https://open-banking-ais.onrender.com` 
 * You have curl and jq installed (on mac install using brew)
 * Endpoints `/connect/mtls/token`, `/account-access-consents`, `/psu/authorize`, `/accounts` are available
 * You have an authorized <CLIENT_ID> and <CLIENT_SECRET> required for steps 1 and 4
@@ -157,9 +157,9 @@ You should only see the accounts the PSU selected (e.g., acc-001, acc-002). If y
 * 400 invalid_request: Missing refresh_token → pass refresh_token= field.
 * 400 invalid_grant: Unknown refresh token → token was never issued, already rotated and discarded, or typo.
 * 400 invalid_grant: Refresh token expired → 30-day TTL passed; you must re-run the full consent/token flow.
-* 401 “mtls_required” on token calls → ensure `-H "X-Client-Cert`: enrolled" is present.
-* 401 “Access token expired” → tokens last 600s; repeat step 4 (or use the refresh flow).
-* 403 “consent_not_authorised” or "consent_expired on data calls" on /accounts → make sure you ran step 3 and that you’re using a token with consent_id (step 4), not the client token from step 1.
+* 401 `"mtls_required"` on token calls → ensure `-H "X-Client-Cert: enrolled"` is present.
+* 401 `"Access token expired"` → tokens last 600s; repeat step 4 (or use the refresh flow).
+* 403 `"consent_not_authorised"` or `"consent_expired on data calls"` on /accounts → make sure you ran step 3 and that you’re using a token with consent_id (step 4), not the client token from step 1.
 
 We list all the error codes for completeness below
 
