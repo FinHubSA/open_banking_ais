@@ -65,7 +65,7 @@ Scope/consent_id: inherited from the original token that produced it—unchanged
 
 This token lets the TPP create/read consents. (Simulated mTLS header required.)
 ```bash
-curl -s -X POST http://127.0.0.1:8000/connect/mtls/token \
+curl -s -X POST https://open-banking-ais.onrender.com/connect/mtls/token \
   -H "X-Client-Cert: enrolled" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials&client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>" \
@@ -81,7 +81,7 @@ If you don’t have jq, just read the JSON and copy the access_token manually.
 Minimal permissions for account listing = ReadAccountsBasic.
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/account-access-consents \
+curl -s -X POST https://open-banking-ais.onrender.com/account-access-consents \
   -H "Authorization: Bearer $CLIENT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -123,7 +123,7 @@ You can use the HTML page in a browser:
 Or do it headless via a form POST (approve acc-001 and acc-002):
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/psu/authorize \
+curl -s -X POST https://open-banking-ais.onrender.com/psu/authorize \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "consentId=$CONSENT_ID&selected_accounts=acc-001&selected_accounts=acc-002"
 ```
@@ -142,7 +142,7 @@ curl -s https://open-banking-ais.onrender.com/account-access-consents/$CONSENT_I
 Now request a token with the consent_id and the scope you’ll use (accounts.read).
 
 ```bash
-curl -s -X POST http://127.0.0.1:8000/connect/mtls/token \
+curl -s -X POST https://open-banking-ais.onrender.com/connect/mtls/token \
   -H "X-Client-Cert: enrolled" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials&client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>&consent_id=$CONSENT_ID&scope=accounts.read" \
@@ -154,11 +154,11 @@ ACCESS_TOKEN=$(jq -r .access_token /tmp/data_token.json)
 ### 5 Retrieve the authorised accounts
 List all authorised accounts the PSU approved in step 3
 ```bash
-curl -s "http://127.0.0.1:8000/accounts?limit=50" \
+curl -s "https://open-banking-ais.onrender.com/accounts?limit=50" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 # (Optional) Get one account by id
-curl -s "http://127.0.0.1:8000/accounts/acc-001" \
+curl -s "https://open-banking-ais.onrender.com/accounts/acc-001" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
