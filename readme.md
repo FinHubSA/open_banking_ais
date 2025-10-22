@@ -113,6 +113,8 @@ This is the full set of `permissions` which you can pass to obtain consent for a
   ]
 ```
 
+"ReadTransactionsBasic", "ReadTransactionsCredits" and "ReadTransactionsDebits" are all required to give access to the scope "transactions.read", we have not enforced direction - forthcoming. 
+
 ### 3 PSU authorises the consent (select accounts)
 
 You can use the HTML page in a browser:
@@ -139,7 +141,7 @@ curl -s https://open-banking-ais.onrender.com/account-access-consents/<$CONSENT_
 
 ### 4 Get a data access token bound to the consent
 
-Now request a token with the consent_id and the scope you’ll use (accounts.read). Other scopes are: "accounts.read", "balances.read", "transactions.read", "beneficiaries.read" which map from the permissions above.
+Now request a token with the consent_id and the scope you’ll use (accounts.read). Other scopes are: "accounts.read", "balances.read", "transactions.read", "beneficiaries.read" which map from the permissions above. For multiple scopes, separante the scopes with a space when passing them.
 
 ```bash
 curl -s -X POST https://open-banking-ais.onrender.com/connect/mtls/token \
