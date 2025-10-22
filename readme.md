@@ -117,7 +117,7 @@ This is the full set of `permissions` which you can pass to obtain consent for a
 
 You can use the HTML page in a browser:
 
-`https://open-banking-ais.onrender.com/psu/authorize/ui?consentId=cns_b0301f15356a`
+`https://open-banking-ais.onrender.com/psu/authorize/ui?consentId=<$CONSENT_ID>`
 
 
 Or do it headless via a form POST (approve acc-001 and acc-002):
@@ -133,13 +133,13 @@ Note: this is a dummy implementation of the PSU aproval page where the user simp
 (Optional) verify status is now Authorised and shows the selected accounts:
 
 ```bash
-curl -s https://open-banking-ais.onrender.com/account-access-consents/$CONSENT_ID \
+curl -s https://open-banking-ais.onrender.com/account-access-consents/<$CONSENT_ID> \
   -H "Authorization: Bearer $CLIENT_TOKEN"
 ```
 
 ### 4 Get a data access token bound to the consent
 
-Now request a token with the consent_id and the scope you’ll use (accounts.read).
+Now request a token with the consent_id and the scope you’ll use (accounts.read). Other scopes are: "accounts.read", "balances.read", "transactions.read", "beneficiaries.read" which map from the permissions above.
 
 ```bash
 curl -s -X POST https://open-banking-ais.onrender.com/connect/mtls/token \
