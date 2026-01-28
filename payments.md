@@ -2,7 +2,7 @@
 
 ## Assumptions
 
-* Base URL: http://127.0.0.1:8000 (set BASE accordingly)
+* Base URL: http://127.0.0.1:8000 (set BASE accordingly), https://open-banking-ais.onrender.com if deployment
 * You’ve added the payments.read / payments.write scopes to your token service.
 * mTLS is optional/disabled in your current code; if you enable it later, add the header noted below.
 
