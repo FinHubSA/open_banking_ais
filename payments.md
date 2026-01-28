@@ -103,7 +103,7 @@ AUTH_CODE=$(jq -r .AuthorisationCode /tmp/pis_consent_authorised.json)
 echo "AUTH_CODE=$AUTH_CODE"
 ```
 
-### Option 2 Simulator route (no UI)
+#### Option 2 Simulator route (no UI)
 
 Instead of using the UI, this directly marks consent as authorised and returns the consent with the code.
 
@@ -161,27 +161,38 @@ You’ll get:
 * If you get 401 Missing/invalid X-Authorisation-Code, ensure you’re using the code from the authorization step (UI from PSU option 1 or headless option 2).
 * If you get 403 Consent not Authorised, repeat authorization step (option 1 or option 2)
 
-### Initiate the payment
+### Initiate the payment (must use the SAME PIS_TOKEN you created with payments.write)
 
 ```bash
-PAY_JSON=$(curl -s -X POST http://127.0.0.1:8000/domestic-payments \
-  -H "Authorization: Bearer $TOKEN" \
+# Step 5:
+PAY_JSON=$(curl -s -X POST "$BASE/domestic-payments" \
+  -H "Authorization: Bearer $PIS_TOKEN" \
   -H "X-Authorisation-Code: $AUTH_CODE" \
   -H "Content-Type: application/json" \
-  -d "{\"consentId\":\"$CONSENT_ID\",\"idempotencyKey\":\"demo-$(date +%s)\"}")
+  -d "{\"consentId\":\"$CONSENT_ID\",\"idempotencyKey\":\"demo-$(date +%s)\"}") \
+  || { echo "curl failed"; exit 1; }
+
+echo "$PAY_JSON" | jq .
 PAY_ID=$(jq -r .DomesticPaymentId <<<"$PAY_JSON")
+echo "PAY_ID=$PAY_ID"
 ```
 
 
 Note that you pass: 
-* Header Authorization: Bearer … with payments.write
-* Header X-Authorisation-Code: <code from Step 3>
+* Header Authorization: Bearer … with payments.write the $PIS_TOKEN
+* Header X-Authorisation-Code: <code from PSU authorization step>
 * Body { "consentId": "<CONSENT_ID>", "idempotencyKey": "<optional>" }
 
-### Check payment status 
+### Check payment status (needs payments.read)
 
-curl -s -X GET http://127.0.0.1:8000/domestic-payments/$PAY_ID \
-  -H "Authorization: Bearer $TOKEN"
+* If your PIS_TOKEN only had payments.write, mint a token that includes both:
+* scope=payments.write payments.read
+
+```bash
+curl -s -X GET "$BASE/domestic-payments/$PAY_ID" \
+  -H "Authorization: Bearer $PIS_TOKEN" \
+  | jq .
+  ```
 
 ## Common pitfalls
 
