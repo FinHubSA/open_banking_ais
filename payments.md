@@ -161,6 +161,28 @@ You’ll get:
 * If you get 401 Missing/invalid X-Authorisation-Code, ensure you’re using the code from the authorization step (UI from PSU option 1 or headless option 2).
 * If you get 403 Consent not Authorised, repeat authorization step (option 1 or option 2)
 
+### Initiate the payment
+
+```bash
+PAY_JSON=$(curl -s -X POST http://127.0.0.1:8000/domestic-payments \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Authorisation-Code: $AUTH_CODE" \
+  -H "Content-Type: application/json" \
+  -d "{\"consentId\":\"$CONSENT_ID\",\"idempotencyKey\":\"demo-$(date +%s)\"}")
+PAY_ID=$(jq -r .DomesticPaymentId <<<"$PAY_JSON")
+```
+
+
+Note that you pass: 
+* Header Authorization: Bearer … with payments.write
+* Header X-Authorisation-Code: <code from Step 3>
+* Body { "consentId": "<CONSENT_ID>", "idempotencyKey": "<optional>" }
+
+### Check payment status 
+
+curl -s -X GET http://127.0.0.1:8000/domestic-payments/$PAY_ID \
+  -H "Authorization: Bearer $TOKEN"
+
 ## Common pitfalls
 
 * 403 missing scope → Token lacks payments.write/payments.read
