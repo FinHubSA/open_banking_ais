@@ -10,7 +10,7 @@
 ### Set the base URL
 
 ``` bash
-BASE=http://127.0.0.1:8000
+BASE=http://127.0.0.1:8000 # or https://open-banking-ais.onrender.com if deployed
 ```
 
 
