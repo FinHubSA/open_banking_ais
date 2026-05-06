@@ -1,4 +1,6 @@
-# OB sandbox for AISPs
+# OB sandbox
+
+See https://open-banking-ais.onrender.com/docs for API docs for endpoints and manual test. Request <CLIENT_ID> and <CLIENT_SECRET> from Project Admin. We walk through an example of account information access below. See here for [example payment endpoint access](payments.md).
 
 ## Consent types
 
