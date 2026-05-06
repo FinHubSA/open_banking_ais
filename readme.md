@@ -1,6 +1,6 @@
 # OB sandbox
 
-See https://open-banking-ais.onrender.com/docs for API docs and to manually test. Request <CLIENT_ID> and <CLIENT_SECRET> from Project Admin. We walk through an example of account information access below. See here for [example payment endpoint access](payments.md).
+See https://open-banking-ais.onrender.com/docs for API docs and to manually test. Request individual <CLIENT_ID> and <CLIENT_SECRET> from Project Admin else see demo keys in [Assumptions](#0-assumptions). We walk through an example of account information access below. See here for [example payment endpoint access](payments.md).
 
 ## Consent types
 
@@ -61,6 +61,10 @@ Scope/consent_id: inherited from the original token that produced it—unchanged
 * You have curl and jq installed (on mac install using brew)
 * Endpoints `/connect/mtls/token`, `/account-access-consents`, `/psu/authorize`, `/accounts` are available
 * You have an authorized <CLIENT_ID> and <CLIENT_SECRET> required for steps 1 and 4
+
+Demo keys for sandbox:
+* CLIENT_ID=demo-client
+* CLIENT_SECRET=demo-secret
 
 
 ### 1 Get a client token (not bound to any consent)
